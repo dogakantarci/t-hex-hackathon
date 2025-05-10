@@ -6,7 +6,7 @@ import AdminRequestList from './pages/AdminRequestList';
 import CreateLeavePage from './pages/CreateLeavePage';
 import MyRequestsPage from './pages/MyRequestsPage';
 import AdminAnalysisPage from './pages/AdminAnalysisPage';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar';;
 
 
 function App() {
