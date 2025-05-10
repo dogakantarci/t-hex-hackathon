@@ -1,0 +1,33 @@
+# Bağımlılıklar
+node_modules/
+
+# Üretim derleme çıktısı
+build/
+dist/
+
+# Ortam değişkenleri
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log dosyaları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test kapsamı
+coverage/
+
+# IDE ve editör ayarları
+.vscode/
+.idea/
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+
+# Paket kilit dosyaları (birini kullanıyorsan diğeri yok sayılabilir)
+package-lock.json
+yarn.lock
