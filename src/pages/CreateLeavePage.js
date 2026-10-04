@@ -11,35 +11,53 @@ const CreateLeavePage = () => {
   const [reason, setReason] = useState('');
   const navigate = useNavigate();
 
+  // ✅ Giriş kontrolü
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log("Token:", token);
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.role === 'admin') {
+
+    if (!token || !user) {
+      alert("Lütfen önce giriş yapın.");
+      navigate("/");
+      return;
+    }
+
+    if (user.role === 'admin') {
       navigate('/admin/requests');
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    const token = localStorage.getItem("token");
+
     const data = {
       startDate,
       endDate,
       reason,
     };
-  
+
     try {
-      // Simüle edilmiş API isteği
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-  
-      alert('İzin talebiniz başarıyla gönderildi! (Fake API)');
-      console.log('Sahte gönderilen veri:', data);
-  
+      const response = await axios.post("http://localhost:3001/api/leaves", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert('İzin talebiniz başarıyla gönderildi!');
+      console.log('Sunucuya gönderilen veri:', response.data);
+
+      // Formu temizle
       setStartDate('');
       setEndDate('');
       setReason('');
+      navigate("/my-requests");
+
     } catch (error) {
-      console.error('Simüle edilmiş hata:', error);
-      alert('Bir hata oluştu, lütfen tekrar deneyin.');
+      console.error('Gerçek hata:', error);
+      alert(error.response?.data?.message || 'Bir hata oluştu, lütfen tekrar deneyin.');
     }
   };
 

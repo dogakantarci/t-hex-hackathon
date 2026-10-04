@@ -1,42 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/PageWrapper';
-import Button from '../components/Button';
-import theme from '../theme/theme';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!username || !password || !role) {
-      alert('Lütfen tüm alanları doldurun.');
+    if (!username || !password) {
+      alert('Lütfen kullanıcı adı ve şifre giriniz.');
       return;
     }
 
-    localStorage.setItem('user', JSON.stringify({ username, role }));
+    try {
+      const response = await fetch("http://localhost:3001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: username,
+          password
+        })
+      });
 
-    if (role === 'admin') {
-      navigate('/admin/requests');
-    } else {
-      navigate('/dashboard');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Giriş başarısız");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      if (data.user.role === "admin") {
+        navigate("/admin/requests");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (err) {
+      alert(err.message);
     }
   };
 
   return (
-    <PageWrapper>
-      <h2 style={{ color: theme.colors.primary }}>Talenteer Giriş</h2>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.md }}>
+    <div style={{ maxWidth: '400px', margin: '100px auto', textAlign: 'center' }}>
+      <h2>Talenteer Giriş</h2>
+      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <input
           type="text"
-          placeholder="Kullanıcı adı"
+          placeholder="Ad Soyad"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          required
         />
 
         <input
@@ -44,22 +62,11 @@ const LoginPage = () => {
           placeholder="Şifre"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
 
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          required
-        >
-          <option value="">Rol Seçiniz</option>
-          <option value="employee">Çalışan</option>
-          <option value="admin">İK (Admin)</option>
-        </select>
-
-        <Button type="submit">Giriş Yap</Button>
+        <button type="submit">Giriş Yap</button>
       </form>
-    </PageWrapper>
+    </div>
   );
 };
 

@@ -11,47 +11,26 @@ const MyRequestsPage = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.role === 'employee') {
-      navigate('/admin/requests');
-    }
+    if (!user || user.role !== 'employee') {
+  navigate('/');
+}
+
   }, [navigate]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/leaves')
-      .then((response) => {
-        setRequests(response.data);
-      })
-      .catch((error) => {
-        console.error('İzin talepleri alınamadı:', error);
-      });
-  }, []);
+  axios.get('http://localhost:3001/api/leaves', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+  .then((response) => {
+    setRequests(response.data); // ❗ Eksik olan kısım burası
+  })
+  .catch((error) => {
+    console.error('İzin talepleri alınamadı:', error);
+  });
+}, []);
 
-  // Sahte veri yükle
-  useEffect(() => {
-    setRequests([
-      {
-        id: 1,
-        start: '2024-07-01',
-        end: '2024-07-03',
-        status: 'Onaylandı',
-        reason: 'Aile ziyareti',
-      },
-      {
-        id: 2,
-        start: '2024-06-15',
-        end: '2024-06-16',
-        status: 'Bekliyor',
-        reason: 'Düğün organizasyonu',
-      },
-      {
-        id: 3,
-        start: '2024-05-10',
-        end: '2024-05-11',
-        status: 'Reddedildi',
-        reason: 'Yıllık izin limiti aşıldı',
-      },
-    ]);
-  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
